@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Python Grand Prix – Arithmetic Operators</title>
+<style>
+  :root{--ink:#14213d;--road:#2b2d42;--accent:#e63946;--gold:#f4a300;--ok:#1b9e5a;--bg:#f3f6fb;--card:#fff;--line:#d5dcea}
+  *{box-sizing:border-box}[hidden]{display:none!important}
+  body{margin:0;font-family:"Trebuchet MS","Segoe UI",Arial,sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;display:flex;flex-direction:column}
+  header{background:var(--ink);color:#fff;padding:10px 18px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  header h1{font-size:20px;margin:0;flex:1;letter-spacing:.5px}
+  .chip{background:rgba(255,255,255,.14);border-radius:20px;padding:5px 12px;font-size:14px}
+  .chip b{color:var(--gold);font-size:16px}
+  button{font:inherit;cursor:pointer;border:0;border-radius:8px;padding:9px 16px;background:var(--ink);color:#fff}
+  button:hover{filter:brightness(1.15)}
+  button.ghost{background:transparent;border:1px solid rgba(255,255,255,.5);padding:5px 10px;font-size:13px}
+  button.light{background:#e8edf7;color:var(--ink)}
+  main{flex:1;width:100%;max-width:1120px;margin:0 auto;padding:16px;display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:16px;align-items:start}
+  main.solo{grid-template-columns:minmax(0,760px);justify-content:center}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px;box-shadow:0 2px 8px rgba(20,33,61,.06)}
+  .card h2{margin:0 0 6px;font-size:22px}
+  .tag{display:inline-block;background:var(--accent);color:#fff;border-radius:6px;font-size:12px;padding:2px 8px;margin-bottom:8px;letter-spacing:.5px}
+  p{line-height:1.5;margin:8px 0}
+  label{display:block;font-size:14px;margin:10px 0 4px;font-weight:bold}
+  input,select{font:inherit;padding:9px 10px;border:1px solid var(--line);border-radius:8px;width:100%}
+  .row{display:flex;gap:10px;flex-wrap:wrap}.row>*{flex:1;min-width:120px}
+  .track{position:relative;height:60px;background:var(--road);border-radius:12px;margin-bottom:14px;overflow:hidden}
+  .track:before{content:"";position:absolute;left:0;right:0;top:50%;border-top:3px dashed rgba(255,255,255,.5)}
+  .finish{position:absolute;right:0;top:0;bottom:0;width:24px;background:repeating-conic-gradient(#fff 0 25%,#111 0 50%) 0 0/12px 12px}
+  .car{position:absolute;top:13px;font-size:28px;transition:left .8s cubic-bezier(.3,1.4,.5,1);transform:translateX(-50%) scaleX(-1)}
+  .map h3{margin:0 0 4px;font-size:17px}.map small{color:#5b6785}
+  .lane-r{display:grid;grid-template-columns:26px 1fr 34px;gap:6px;align-items:center;margin-top:9px;font-size:13px}
+  .lane-r .rk{font-weight:bold;text-align:center;font-size:15px}
+  .lane-r .nm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .lane-r .bar{position:relative;height:20px;background:var(--road);border-radius:10px;margin-top:2px}
+  .lane-r .bar i{position:absolute;top:-3px;font-style:normal;font-size:17px;transform:translateX(-50%) scaleX(-1);transition:left .8s}
+  .lane-r .bar:after{content:"";position:absolute;right:0;top:0;bottom:0;width:8px;border-radius:0 10px 10px 0;background:repeating-conic-gradient(#fff 0 25%,#111 0 50%) 0 0/8px 8px}
+  .lane-r .pt{font-weight:bold;color:var(--accent);text-align:right}
+  .lane-r.me .nm{font-weight:bold;color:var(--accent)}
+  .sep{border-top:1px dashed var(--line);margin-top:10px}
+  .lanes{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}
+  .lane{background:#fff;color:var(--ink);border:2px solid var(--line);padding:14px 8px;text-align:center;border-radius:12px}
+  .lane:hover{border-color:var(--accent);filter:none}
+  .lane span{font-size:30px;display:block}.lane small{display:block;color:#5b6785}
+  .opts{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:12px}
+  .opts button,.ops button{background:#fff;color:var(--ink);border:2px solid var(--line);font-family:Consolas,monospace;font-size:18px}
+  .opts button:hover,.ops button:hover{border-color:var(--accent);filter:none}
+  .ops{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.ops button{font-size:22px;min-width:60px}
+  .code{font-family:Consolas,"Courier New",monospace;background:#101828;color:#e6edf7;border-radius:10px;padding:12px 14px;font-size:17px;margin:10px 0}
+  .code .p{color:#7ee787}.code .o{color:#ffd166}.code .e{color:#ff8fa3}
+  .inp{display:flex;gap:8px;margin-top:10px}.inp input{font-family:Consolas,monospace;font-size:17px}
+  .msg{min-height:24px;font-weight:bold;margin-top:8px}.msg.ok{color:var(--ok)}.msg.no{color:var(--accent)}
+  .hint{background:#fff7e0;border-left:4px solid var(--gold);padding:8px 12px;border-radius:6px;margin-top:8px;font-size:14px}
+  .tools{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+  .pit{margin-top:12px;display:flex;gap:6px;flex-wrap:wrap;font-size:13px}
+  .pit span{background:#fff;border:1px solid var(--line);border-radius:8px;padding:4px 8px}
+  .pit code{font-weight:bold;color:var(--accent);font-size:15px}
+  .jig{display:grid;grid-template-columns:repeat(3,130px);gap:3px;margin:12px auto;width:max-content}
+  .tile{width:130px;height:130px;padding:0;border-radius:6px;background-size:390px 260px;background-color:#ccc}
+  .tile.sel{outline:4px solid var(--gold);outline-offset:-4px}
+  .hack{background:#06130c;color:#39ff7a;border-radius:12px;padding:18px;font-family:Consolas,monospace;text-align:center;margin-top:10px}
+  .hack .tgt{font-size:15px;letter-spacing:2px;color:#9be7b5}
+  .hack .scr{font-size:30px;min-height:48px;margin:8px 0;color:#fff}
+  .hopts{display:grid;grid-template-columns:repeat(2,150px);gap:10px;justify-content:center;margin-top:10px}
+  .hopts button{background:#0f2a1b;color:#39ff7a;border:1px solid #1f6b40;font-family:Consolas,monospace;font-size:20px;padding:8px 0}
+  .match{display:grid;grid-template-columns:1fr 1fr;gap:10px 24px;margin-top:12px}
+  .match button{background:#fff;color:var(--ink);border:2px solid var(--line);font-family:Consolas,monospace;font-size:18px}
+  .match button.sel{border-color:var(--gold);background:#fff7e0}
+  .match button.done{border-color:var(--ok);background:#e5f6ec;color:var(--ok)}
+  .big{font-size:54px;text-align:center;margin:4px 0}
+  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:14px 0;text-align:center}
+  .stats div{background:#f3f6fb;border-radius:10px;padding:10px}.stats b{display:block;font-size:24px;color:var(--accent)}
+  .dots:after{content:"";animation:d 1.2s steps(4) infinite}@keyframes d{25%{content:"."}50%{content:".."}75%{content:"..."}}
+  footer{text-align:center;font-size:12.5px;color:#5b6785;padding:14px;border-top:1px solid var(--line);background:#fff}
+  .shake{animation:sh .35s}@keyframes sh{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+  @media(max-width:900px){main{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header>
+  <h1>🏁 Python Grand Prix</h1>
+  <span class="chip" id="net" hidden></span>
+  <span class="chip" id="who" hidden></span>
+  <span class="chip" id="ptsChip" hidden>Points: <b id="pts">0</b></span>
+  <button class="ghost" id="outBtn" hidden>Sign out</button>
+</header>
+
+<main id="main" class="solo">
+  <section>
+    <div class="track" id="track" hidden><div class="finish"></div><div class="car" id="car">🏎️</div></div>
+    <div class="card" id="view"></div>
+    <div class="pit" id="pit" hidden>
+      <span><code>+</code> add</span><span><code>-</code> subtract</span><span><code>*</code> multiply</span>
+      <span><code>/</code> divide</span><span><code>( )</code> done first</span>
+    </div>
+  </section>
+  <aside class="card map" id="map" hidden></aside>
+</main>
+
+<footer>
+  © 2026 Bindhuja Bose B · Department of Computer Science · Sharjah Indian School, Juwaiza<br>
+  Teacher-made website for classroom learning. All rights reserved.
+</footer>
+
+<script>
+(function(){
+"use strict";
+/* ===== Teacher setting =====
+   Paste your Apps Script Web app link between the quotes (it ends with /exec).
+   With the link: live race, shared road map, teacher dashboard and noise penalties.
+   Left empty: the page works as single-player practice only.                     */
+var API_URL = "";
+
+/* ===== Mini Python engine (+ - * / and brackets) ===== */
+function pyEval(src){
+  src=src.trim().replace(/^print\s*\((.*)\)\s*$/,"$1");
+  var t=[],i=0,m;
+  while(i<src.length){
+    var c=src[i];
+    if(c===" "){i++;continue;}
+    if((m=/^(\d+\.?\d*|\.\d+)/.exec(src.slice(i)))){t.push({k:"n",v:parseFloat(m[1]),f:m[1].indexOf(".")>=0});i+=m[1].length;continue;}
+    var two=src.substr(i,2);
+    if(two==="**"||two==="//"||c==="%")throw "This race uses only  +  -  *  /";
+    if("+-*/()".indexOf(c)>=0){t.push({k:"o",v:c});i++;continue;}
+    if("×xX÷".indexOf(c)>=0)throw "SyntaxError: Python does not use '"+c+"'";
+    throw "SyntaxError: invalid character '"+c+"'";
+  }
+  if(!t.length)throw "Type an expression first";
+  var p=0;
+  function peek(){return t[p]&&t[p].k==="o"?t[p].v:null;}
+  function expr(){var a=term();while(peek()==="+"||peek()==="-"){var o=t[p++].v,b=term();a={v:o==="+"?a.v+b.v:a.v-b.v,f:a.f||b.f};}return a;}
+  function term(){var a=un();while(peek()==="*"||peek()==="/"){var o=t[p++].v,b=un();
+    if(o==="*")a={v:a.v*b.v,f:a.f||b.f};else{if(b.v===0)throw "ZeroDivisionError: division by zero";a={v:a.v/b.v,f:true};}}return a;}
+  function un(){if(peek()==="-"){p++;var a=un();return{v:-a.v,f:a.f};}if(peek()==="+"){p++;return un();}return atom();}
+  function atom(){var x=t[p];if(!x)throw "SyntaxError: incomplete expression";
+    if(x.k==="n"){p++;return x;}
+    if(x.v==="("){p++;var a=expr();if(peek()!==")")throw "SyntaxError: missing )";p++;return a;}
+    throw "SyntaxError: invalid syntax";}
+  var r=expr();
+  if(p<t.length)throw "SyntaxError: invalid syntax";
+  return {v:r.v,f:r.f,ops:t.filter(function(x){return x.k==="o";}).map(function(x){return x.v;})};
+}
+function pyShow(r){
+  if(!r.f)return String(r.v);
+  var s=String(parseFloat(r.v.toPrecision(15)));
+  return s.indexOf(".")<0&&s.indexOf("e")<0?s+".0":s;
+}
+
+/* ===== Race content ===== */
+var STARTER=[
+  {q:"Warm-up 1: What will Python print?",code:"print(12 * 3)",opts:["15","36","123","4"],a:1,why:"* means multiply."},
+  {q:"Warm-up 2: What will Python print?",code:"print(10 / 4)",opts:["2","2.5","6","40"],a:1,why:"/ divides and gives a decimal answer."}
+];
+var PLENARY=[
+  {q:"Final stretch 1: Which symbol does Python use to multiply?",opts:["x","×","*","."],a:2,why:"Python uses * for multiplication."},
+  {q:"Final stretch 2: What will Python print?",code:"print(10 + 2 * 3)",opts:["36","15","16","18"],a:2,why:"* is done before +, just like BODMAS."}
+];
+var LAPS=[
+ {title:"Lap 1 · School Trip Tickets",lanes:[
+   {type:"pick",text:"130 students are going to Global Village. Each ticket costs AED 25. Pick the operator that gives the total cost.",l:"130",r:"25",a:"*",hint:"Same price, many times."},
+   {type:"expr",text:"130 students, AED 25 per ticket. Type a Python expression for the total ticket cost.",val:3250,need:["*"],hint:"Repeated addition has a shortcut operator."},
+   {type:"expr",text:"The trip budget is AED 4000. 130 tickets cost AED 25 each. Type ONE expression for the money left over.",val:750,need:["*","-"],hint:"Find the ticket cost and take it away from the budget – in one line."}]},
+ {title:"Lap 2 · Sharing the Bill",lanes:[
+   {type:"pick",text:"4 friends share an AED 150 restaurant bill equally. Pick the operator that gives each friend's share.",l:"150",r:"4",a:"/",hint:"Splitting into equal parts."},
+   {type:"expr",text:"UAE flags cost AED 975 in total. 130 students share the cost equally. Type an expression for each student's share.",val:7.5,need:["/"],hint:"Total cost split into equal parts."},
+   {type:"expr",text:"A taxi charges AED 12 to start plus AED 3 per km. 4 friends share a 20 km ride equally. Type ONE expression for each friend's share.",val:18,need:["*","+","/","("],hint:"Work out the whole fare first – what makes Python do that part first?"}]},
+ {title:"Lap 3 · Dubai Mall Change",lanes:[
+   {type:"pick",text:"You pay with an AED 500 note. Your shopping costs AED 365. Pick the operator that gives your change.",l:"500",r:"365",a:"-",hint:"Take the cost away from what you paid."},
+   {type:"expr",text:"Bug fix! This should print the average of three scores but prints 206.67. Fix it.",show:"85 + 90 + 95 / 3",val:90,need:["(","/"],hint:"Python divides before it adds. What makes it add first?"},
+   {type:"expr",text:"You buy 3 shirts at AED 60 each and 2 caps at AED 25 each, and pay with AED 500. Type ONE expression for your change.",val:270,need:["*","-"],hint:"Both costs must be taken away from 500."}]}
+];
+var BONUS={title:"Bonus Lap · VAT Bill",lanes:[null,
+   {type:"expr",text:"You buy 3 shirts at AED 60 each. VAT is 5%. Type ONE expression for the final bill including VAT.",val:189,need:["*","/"],hint:"VAT is the total × 5 / 100, added on top of the total."}]};
+var LANEINFO=[["🚗","Cruise",6],["🏎️","Speed",10],["🚀","Turbo",14]];
+var STEPS=7, UNLOCK=2;
+
+/* ===== Protected state (kept inside this closure) ===== */
+var S=null, KEY="pgp_run2", SALT="sis-juwaiza-gp", board=[], online=true, timer=null, note="";
+function h(str){var x=5381;for(var i=0;i<str.length;i++)x=((x<<5)+x+str.charCodeAt(i))|0;return Math.abs(x);}
+function save(){try{var j=JSON.stringify(S);sessionStorage.setItem(KEY,j+"|"+h(j+SALT));}catch(e){}}
+function load(){try{var raw=sessionStorage.getItem(KEY);if(!raw)return;var i=raw.lastIndexOf("|"),j=raw.slice(0,i);
+  if(String(h(j+SALT))===raw.slice(i+1))S=JSON.parse(j);else sessionStorage.removeItem(KEY);}catch(e){}}
+function netPts(){return Math.max(0,S.pts-5*S.pen);}
+function addPts(n){S.pts+=n;save();paint();sync();}
+
+var $=function(id){return document.getElementById(id);}, view=$("view");
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
+function ord(n){return n+(n%10===1&&n!==11?"st":n%10===2&&n!==12?"nd":n%10===3&&n!==13?"rd":"th");}
+function paint(){
+  var on=!!S;
+  ["who","ptsChip","outBtn"].forEach(function(id){$(id).hidden=!on;});
+  $("track").hidden=!on||S.stage==="lobby";
+  $("pit").hidden=!on||S.stage==="finish"||S.stage==="lobby";
+  $("map").hidden=!on||!API_URL;
+  $("main").className=on&&API_URL?"":"solo";
+  $("net").hidden=!on;
+  if(!on)return;
+  $("net").textContent=!API_URL?"Practice mode":online?"● Live":"Reconnecting…";
+  $("who").textContent=S.name+" · "+S.cls+" "+S.div;
+  $("pts").textContent=netPts();
+  $("car").style.left=(4+91*Math.min(S.done,STEPS)/STEPS)+"%";
+  drawMap();
+}
+setInterval(function(){if(S)paint();},1000);   // re-draws the real score, so Inspect edits never stick
+
+/* ===== Live race link ===== */
+function api(params){
+  var qs=Object.keys(params).map(function(k){return k+"="+encodeURIComponent(params[k]);}).join("&");
+  return fetch(API_URL+"?"+qs,{redirect:"follow"}).then(function(r){return r.json();});
+}
+function sync(){
+  if(!API_URL||!S)return;
+  clearTimeout(timer);
+  api({action:"sync",id:S.id,rid:S.rid,step:S.done,pts:S.pts}).then(function(r){
+    online=true;
+    if(!S)return;
+    if(r.reset){signOut("Your teacher started a new race. Please sign in again.");return;}
+    if(r.board)board=r.board;
+    if(typeof r.pen==="number"&&r.pen!==S.pen){S.pen=r.pen;save();}
+    if(S.stage==="lobby"&&r.status==="live"){S.stage="starter";save();route();}
+    else if(S.stage==="finish")finishInfo();
+    paint();
+  }).catch(function(){online=false;}).then(function(){
+    if(S)timer=setTimeout(sync,(S.stage==="lobby"?3000:S.stage==="finish"?8000:5000)+Math.random()*1500);
+  });
+}
+function drawMap(){
+  if(!API_URL)return;
+  var me=-1;board.forEach(function(b,i){if(b.me)me=i;});
+  var rows=board.slice(0,6).map(function(b,i){return rowHtml(b,i);}).join("");
+  if(me>=6)rows+='<div class="sep"></div>'+rowHtml(board[me],me);
+  $("map").innerHTML='<h3>🗺️ Live road map</h3><small>'+board.length+' driver'+(board.length===1?"":"s")+' on the track</small>'+(rows||'<p>Waiting for drivers…</p>');
+}
+function rowHtml(b,i){
+  var medal=b.fin?(["🥇","🥈","🥉"][i]||"🏁"):(i+1);
+  return '<div class="lane-r'+(b.me?" me":"")+'"><div class="rk">'+medal+'</div><div><div class="nm">'+esc(b.n)+' · '+esc(b.d)+'</div>'+
+    '<div class="bar"><i style="left:'+(6+86*b.s/STEPS)+'%">🏎️</i></div></div><div class="pt">'+b.p+'</div></div>';
+}
+
+/* ===== Screens ===== */
+function login(){
+  var divs="ABCDEFGHIJKLMNOPQ".split("").map(function(d){return "<option>"+d+"</option>";}).join("");
+  view.innerHTML='<span class="tag">ARITHMETIC OPERATORS IN PYTHON</span><h2>Driver sign-in</h2>'+
+   '<p>Win a mini-game to unlock each Python question. First driver to the chequered flag wins!</p>'+
+   '<label for="nm">Name</label><input id="nm" maxlength="24" autocomplete="off">'+
+   '<div class="row"><div><label for="cl">Class</label><select id="cl"><option>VIII</option><option>VII</option><option>VI</option></select></div>'+
+   '<div><label for="dv">Division</label><select id="dv">'+divs+'</select></div></div>'+
+   '<div class="msg no" id="lm">'+esc(note)+'</div><div class="tools"><button id="go">Start engine 🏁</button></div>';
+  note="";
+  $("go").onclick=function(){
+    var n=$("nm").value.replace(/[^A-Za-z .]/g,"").trim();
+    if(n.length<2){$("lm").textContent="Please type your name (letters only).";return;}
+    var id="";for(var k=0;k<14;k++)id+="abcdefghijklmnopqrstuvwxyz0123456789"[Math.floor(Math.random()*36)];
+    var base={id:id,name:n,cls:$("cl").value,div:$("dv").value,rid:0,pts:0,pen:0,done:0,stage:"starter",i:0,lane:-1,worth:0,hint:false,open:false,t0:Date.now(),t1:0};
+    if(!API_URL){S=base;save();route();return;}
+    $("go").disabled=true;$("lm").textContent="Connecting…";
+    api({action:"join",id:id,name:n,cls:base.cls,div:base.div}).then(function(r){
+      if(!r.ok)throw 0;
+      S=base;S.rid=r.rid;S.stage=r.status==="live"?"starter":"lobby";board=r.board||[];save();route();sync();
+    }).catch(function(){$("go").disabled=false;$("lm").textContent="Could not connect. Check the internet and try again.";});
+  };
+}
+function signOut(msg){clearTimeout(timer);try{sessionStorage.removeItem(KEY);}catch(e){}S=null;board=[];note=msg||"";paint();login();}
+function route(){
+  paint();
+  if(!S)return login();
+  if(S.stage==="lobby")return lobby();
+  if(S.stage==="gate")return gate();
+  if(S.stage==="finish")return finish();
+  if(!S.open)return miniGame();
+  if(S.stage==="starter")return quiz(STARTER,"WARM-UP LAP","lap");
+  if(S.stage==="lap")return lap(LAPS[S.i],false);
+  if(S.stage==="bonus")return lap(BONUS,true);
+  return quiz(PLENARY,"FINAL STRETCH","finish");
+}
+function lobby(){
+  view.innerHTML='<div class="big">🚦</div><h2 style="text-align:center">On the starting grid</h2>'+
+    '<p style="text-align:center">Waiting for your teacher to start the race<span class="dots"></span></p>';
+}
+function lock(){Array.prototype.forEach.call(view.querySelectorAll("button,input"),function(e){e.disabled=true;});}
+function bump(){view.classList.remove("shake");void view.offsetWidth;view.classList.add("shake");}
+function shuffle(a){for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1)),t=a[i];a[i]=a[j];a[j]=t;}return a;}
+
+/* ===== Mini-games: win one to unlock the question ===== */
+var PICS=[
+ '<rect width="390" height="260" fill="#ffd9a0"/><rect width="390" height="130" fill="#ffb347"/><circle cx="70" cy="60" r="38" fill="#fff3b0"/><ellipse cx="300" cy="50" rx="46" ry="16" fill="#fff"/><path d="M0 170 Q100 110 200 170 T390 150 V260 H0Z" fill="#e09f3e"/><path d="M0 215 Q130 165 260 215 T390 205 V260 H0Z" fill="#b5651d"/><rect x="318" y="120" width="10" height="90" fill="#6b4226"/><ellipse cx="300" cy="118" rx="30" ry="9" fill="#2d6a4f"/><ellipse cx="346" cy="118" rx="30" ry="9" fill="#40916c"/><rect x="120" y="180" width="44" height="26" rx="6" fill="#7f5539"/><circle cx="170" cy="172" r="9" fill="#7f5539"/><rect x="126" y="204" width="5" height="22" fill="#7f5539"/><rect x="154" y="204" width="5" height="22" fill="#7f5539"/>',
+ '<rect width="390" height="260" fill="#8ecae6"/><rect y="150" width="390" height="110" fill="#3a3a48"/><rect y="200" width="390" height="6" fill="#fff" opacity=".7"/><rect y="140" width="390" height="12" fill="#52b788"/><rect x="20" y="60" width="150" height="80" fill="#f4a261"/><rect x="20" y="60" width="150" height="14" fill="#e63946"/><circle cx="50" cy="105" r="9" fill="#14213d"/><circle cx="95" cy="105" r="9" fill="#fff"/><circle cx="140" cy="105" r="9" fill="#14213d"/><rect x="300" y="30" width="6" height="112" fill="#222"/><path d="M306 30h50v34h-50z" fill="#fff"/><path d="M306 30h25v17h-25zM331 47h25v17h-25z" fill="#111"/><rect x="190" y="165" width="120" height="26" rx="12" fill="#e63946"/><rect x="225" y="150" width="46" height="20" rx="8" fill="#ffd166"/><circle cx="215" cy="194" r="13" fill="#111"/><circle cx="290" cy="194" r="13" fill="#111"/><circle cx="345" cy="225" r="14" fill="#f4a300"/>',
+ '<rect width="390" height="260" fill="#14213d"/><circle cx="320" cy="55" r="30" fill="#fdf0d5"/><circle cx="40" cy="30" r="3" fill="#fff"/><circle cx="120" cy="60" r="3" fill="#fff"/><circle cx="210" cy="25" r="3" fill="#fff"/><rect x="10" y="150" width="60" height="110" fill="#457b9d"/><rect x="80" y="110" width="50" height="150" fill="#e76f51"/><rect x="140" y="60" width="36" height="200" fill="#a8dadc"/><path d="M158 10l10 50h-20z" fill="#a8dadc"/><rect x="186" y="170" width="70" height="90" fill="#f4a300"/><rect x="266" y="130" width="50" height="130" fill="#2a9d8f"/><rect x="326" y="180" width="54" height="80" fill="#9d4edd"/><rect x="22" y="165" width="12" height="12" fill="#ffd166"/><rect x="46" y="195" width="12" height="12" fill="#ffd166"/><rect x="96" y="130" width="12" height="12" fill="#fff"/><rect x="200" y="190" width="14" height="14" fill="#14213d"/><rect x="280" y="150" width="12" height="12" fill="#ffd166"/><rect x="345" y="200" width="14" height="14" fill="#fff"/>'
+];
+var PAIRS=[
+ [["+","add"],["-","subtract"],["*","multiply"],["/","divide"]],
+ [["6 + 2","8"],["6 - 2","4"],["6 * 2","12"],["6 / 2","3.0"]]
+];
+function miniGame(){
+  var n=S.stage==="bonus"?STEPS:S.done, kind=n%3;
+  function won(){S.open=true;$("gm").className="msg ok";$("gm").textContent="🔓 Unlocked! +"+UNLOCK;lock();addPts(UNLOCK);setTimeout(route,900);}
+  var top='<span class="tag">UNLOCK CHECKPOINT '+(Math.min(n,STEPS-1)+1)+'</span>';
+  if(kind===0){                                   // jigsaw
+    view.innerHTML=top+'<h2>🧩 Fix the picture</h2><p>Click two pieces to swap them.</p><div class="jig" id="jg"></div><div class="msg" id="gm"></div>';
+    var pic='url("data:image/svg+xml,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 390 260">'+PICS[Math.floor(n/3)%3]+'</svg>')+'")';
+    var o=[0,1,2,3,4,5],sel=-1;
+    do{shuffle(o);}while(o.filter(function(v,i){return v===i;}).length>1);
+    var draw=function(){
+      $("jg").innerHTML=o.map(function(v,i){return '<button class="tile'+(i===sel?" sel":"")+'" data-i="'+i+'" aria-label="piece"></button>';}).join("");
+      Array.prototype.forEach.call($("jg").children,function(b,i){
+        b.style.backgroundImage=pic;b.style.backgroundPosition=(-(o[i]%3)*130)+"px "+(-Math.floor(o[i]/3)*130)+"px";
+        b.onclick=function(){
+          if(sel<0){sel=i;draw();return;}
+          var t=o[sel];o[sel]=o[i];o[i]=t;sel=-1;draw();
+          if(o.every(function(v,k){return v===k;}))won();
+        };
+      });
+    };
+    draw();
+  }else if(kind===1){                             // cyber hack: crack a rival's PIN
+    view.innerHTML=top+'<h2>💻 Hack a rival\'s PIN</h2><p>The PIN is what Python prints. Pick it to break in.</p>'+
+      '<div class="hack"><div class="tgt" id="tg"></div><div class="scr" id="sc"></div><div class="hopts" id="ky"></div></div><div class="msg" id="gm"></div>';
+    var rnd=function(n){return Math.floor(Math.random()*n);};
+    var rivals=board.filter(function(b){return !b.me;}).map(function(b){return b.n.split(" ")[0];});
+    var bots=["Turbo-Bot","Nitro-Bot","Zoom-Bot","Blaze-Bot"];
+    var ask=function(){
+      var a=2+rnd(8),b=2+rnd(8),c=2+rnd(5),t=rnd(5),ex,ans,bad,dec=false;
+      if(t===0){ex=a+" + "+b+" * "+c;ans=a+b*c;bad=[(a+b)*c,a*b+c];}
+      else if(t===1){ex=a+" * "+b+" - "+(c-1);ans=a*b-(c-1);bad=[a*b+(c-1),a+b-(c-1)];}
+      else if(t===2){ex="("+a+" + "+b+") * "+c;ans=(a+b)*c;bad=[a+b*c,a*b+c];}
+      else if(t===3){ex=(b*c)+" / "+c+" + "+a;ans=b+a;bad=[];dec=true;}
+      else{var x=a*b+5+rnd(20);ex=x+" - "+a+" * "+b;ans=x-a*b;bad=[(x-a)*b,x-a+b];}
+      var right=dec?ans+".0":String(ans), opts=[right];
+      if(dec)opts.push(String(ans));
+      bad.concat([ans+1,ans-1,ans+2,ans+10,ans+3]).forEach(function(v){
+        var o=dec?v+".0":String(v);if(v>=0&&opts.length<4&&opts.indexOf(o)<0)opts.push(o);});
+      shuffle(opts);
+      $("tg").textContent="TARGET: "+(rivals.length?rivals[rnd(rivals.length)]:bots[rnd(4)])+"'s car";
+      $("sc").textContent="print("+ex+")";
+      $("ky").innerHTML=opts.map(function(o){return "<button>"+o+"</button>";}).join("");
+      Array.prototype.forEach.call($("ky").children,function(bt){bt.onclick=function(){
+        if(bt.textContent===right){$("sc").textContent="ACCESS GRANTED";won();return;}
+        lock();$("gm").className="msg no";$("gm").textContent="Access denied – new PIN coming.";bump();
+        setTimeout(function(){if($("ky")&&!S.open){$("gm").textContent="";ask();}},1300);
+      };});
+    };
+    ask();
+  }else{                                          // match pairs
+    var set=PAIRS[Math.floor(n/3)%2];
+    view.innerHTML=top+'<h2>🔗 Match the pairs</h2><p>Click a card on the left, then its partner on the right.</p><div class="match" id="mt"></div><div class="msg" id="gm"></div>';
+    var L=shuffle([0,1,2,3]),R=shuffle([0,1,2,3]),pick=-1,left=4,html="";
+    for(var k=0;k<4;k++)html+='<button data-s="L" data-v="'+L[k]+'">'+esc(set[L[k]][0])+'</button><button data-s="R" data-v="'+R[k]+'">'+esc(set[R[k]][1])+'</button>';
+    $("mt").innerHTML=html;
+    Array.prototype.forEach.call($("mt").children,function(b){b.onclick=function(){
+      if(b.dataset.s==="L"){pick=+b.dataset.v;Array.prototype.forEach.call($("mt").children,function(x){x.classList.remove("sel");});b.classList.add("sel");return;}
+      if(pick<0)return;
+      if(+b.dataset.v===pick){
+        Array.prototype.forEach.call($("mt").children,function(x){if(+x.dataset.v===pick){x.className="done";x.disabled=true;}});
+        pick=-1;if(--left===0)won();
+      }else{$("gm").className="msg no";$("gm").textContent="Not a pair – try again.";bump();}
+    };});
+  }
+}
+
+/* ===== Questions ===== */
+function quiz(set,tag,next){
+  var q=set[S.i];
+  if(!S.worth){S.worth=5;save();}
+  view.innerHTML='<span class="tag">'+tag+'</span><h2>'+esc(q.q)+'</h2>'+(q.code?'<div class="code">'+esc(q.code)+'</div>':'')+
+    '<div class="opts">'+q.opts.map(function(o,k){return '<button data-k="'+k+'">'+esc(o)+'</button>';}).join("")+'</div><div class="msg" id="m"></div>';
+  Array.prototype.forEach.call(view.querySelectorAll(".opts button"),function(b){
+    b.onclick=function(){
+      var m=$("m");
+      if(+b.dataset.k===q.a){
+        var w=S.worth;S.worth=0;S.done++;S.i++;S.open=false;
+        if(S.i>=set.length){S.i=0;S.stage=next;if(next==="finish")S.t1=Date.now();}
+        m.className="msg ok";m.textContent="✔ +"+w+" · "+q.why;lock();addPts(w);setTimeout(route,1700);
+      }else{S.worth=Math.max(1,S.worth-2);save();b.disabled=true;b.style.opacity=.4;m.className="msg no";m.textContent="Not quite – try another.";bump();}
+    };
+  });
+}
+function lap(L,bonus){
+  if(bonus&&S.lane<0){S.lane=1;S.worth=12;S.hint=false;save();}
+  if(S.lane<0){
+    view.innerHTML='<span class="tag">CHOOSE YOUR LANE</span><h2>'+esc(L.title)+'</h2><p>Harder lane, more points.</p><div class="lanes">'+
+      LANEINFO.map(function(x,k){return '<button class="lane" data-k="'+k+'"><span>'+x[0]+'</span><b>'+x[1]+'</b><small>'+x[2]+' points</small></button>';}).join("")+'</div>';
+    Array.prototype.forEach.call(view.querySelectorAll(".lane"),function(b){b.onclick=function(){S.lane=+b.dataset.k;S.worth=LANEINFO[S.lane][2];S.hint=false;save();route();};});
+    return;
+  }
+  var T=L.lanes[S.lane], html='<span class="tag">'+(bonus?"BONUS":LANEINFO[S.lane][1].toUpperCase()+" LANE")+'</span><h2>'+esc(L.title)+'</h2><p>'+esc(T.text)+'</p>';
+  if(T.type==="pick"){
+    html+='<div class="code">'+T.l+' <span class="o">?</span> '+T.r+'</div><div class="ops">'+["+","-","*","/"].map(function(o){return '<button data-o="'+o+'">'+o+'</button>';}).join("")+'</div>';
+  }else{
+    if(T.show)html+='<div class="code">'+esc(T.show)+'</div>';
+    html+='<div class="inp"><input id="ex" autocomplete="off" spellcheck="false" placeholder="type your Python expression"'+(T.show?' value="'+esc(T.show)+'"':'')+'><button id="run">Run ▶</button></div><div class="code" id="out"><span class="p">&gt;&gt;&gt;</span></div>';
+  }
+  html+='<div class="msg" id="m"></div><div id="hb">'+(S.hint?'<div class="hint">💡 '+esc(T.hint)+'</div>':'')+'</div><div class="tools">'+
+    (S.hint?'':'<button class="light" id="hint">💡 Hint (−2)</button>')+(bonus?'<button class="light" id="skip">Skip to final stretch</button>':'<button class="light" id="chg">Change lane</button>')+'</div>';
+  view.innerHTML=html;
+  var m=$("m");
+  function win(){
+    var w=S.worth;S.lane=-1;S.worth=0;S.hint=false;S.open=false;
+    if(bonus){S.stage="plenary";S.i=0;}
+    else{S.done++;S.i++;if(S.i>=LAPS.length){S.i=0;S.stage="gate";}}
+    m.className="msg ok";m.textContent="✔ Correct! +"+w+" points";lock();addPts(w);setTimeout(route,1500);
+  }
+  function miss(txt){S.worth=Math.max(3,S.worth-2);save();m.className="msg no";m.textContent=txt;bump();}
+  if(T.type==="pick"){
+    Array.prototype.forEach.call(view.querySelectorAll(".ops button"),function(b){b.onclick=function(){
+      if(b.dataset.o===T.a)win();else{b.disabled=true;b.style.opacity=.4;miss("In Python, "+T.l+" "+b.dataset.o+" "+T.r+" gives "+pyShow(pyEval(T.l+b.dataset.o+T.r))+". Try another.");}};});
+  }else{
+    var run=function(){
+      var src=$("ex").value,out=$("out");
+      try{
+        var r=pyEval(src);
+        out.innerHTML='<span class="p">&gt;&gt;&gt;</span> '+esc(src)+'<br><span class="o">'+pyShow(r)+'</span>';
+        var lack=T.need.filter(function(o){return r.ops.indexOf(o)<0;});
+        if(Math.abs(r.v-T.val)<1e-9&&!lack.length)win();
+        else if(Math.abs(r.v-T.val)<1e-9)miss("Right number – but let Python do the work using "+lack.join(" and ")+".");
+        else miss("Python ran it, but that is not the answer yet.");
+      }catch(e){out.innerHTML='<span class="p">&gt;&gt;&gt;</span> '+esc(src)+'<br><span class="e">'+esc(e)+'</span>';m.className="msg no";m.textContent="Fix the error and run again.";}
+    };
+    $("run").onclick=run;$("ex").onkeydown=function(e){if(e.key==="Enter")run();};$("ex").focus();
+  }
+  if($("hint"))$("hint").onclick=function(){S.hint=true;S.worth=Math.max(3,S.worth-2);save();$("hb").innerHTML='<div class="hint">💡 '+esc(T.hint)+'</div>';this.remove();};
+  if($("chg"))$("chg").onclick=function(){S.lane=-1;save();route();};
+  if($("skip"))$("skip").onclick=function(){S.lane=-1;S.stage="plenary";S.i=0;S.open=false;save();route();};
+}
+function gate(){
+  view.innerHTML='<span class="tag">PIT STOP</span><h2>Three laps done! 🎉</h2><p>Head for the finish line now, or take one bonus lap for extra points.</p>'+
+    '<div class="tools"><button id="fin">Go to the final stretch 🏁</button><button class="light" id="bon">Bonus lap (+14)</button></div>';
+  $("fin").onclick=function(){S.stage="plenary";S.i=0;S.open=false;save();route();};
+  $("bon").onclick=function(){S.stage="bonus";S.lane=-1;S.open=false;save();route();};
+}
+function finish(){
+  view.innerHTML='<div class="big">🏁🏆</div><h2 style="text-align:center">Finished, '+esc(S.name)+'!</h2>'+
+    '<p style="text-align:center">Stay quiet and watch the road map – penalties still count.</p><div id="fi"></div>';
+  finishInfo();
+}
+function finishInfo(){
+  if(!$("fi"))return;
+  var me=-1;board.forEach(function(b,i){if(b.me&&b.fin)me=i;});
+  var secs=me>=0?board[me].t:Math.round((S.t1-S.t0)/1000);
+  $("fi").innerHTML='<div class="stats"><div><b>'+(me>=0?ord(me+1):"–")+'</b>position</div><div><b>'+netPts()+'</b>points</div><div><b>'+Math.floor(secs/60)+' min '+(secs%60)+' s</b>race time</div></div>'+
+    (S.pen?'<p style="text-align:center;color:#e63946">Noise penalties: '+S.pen+'</p>':'');
+}
+
+$("outBtn").onclick=function(){signOut("");};
+load();route();sync();
+})();
+</script>
+</body>
+</html>
