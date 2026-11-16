@@ -135,7 +135,7 @@
 <canvas id="fx"></canvas>
 <footer>
   © 2026 Bindhuja Bose B · Department of Computer Science · Sharjah Indian School, Juwaiza<br>
-  Teacher-made website for classroom learning. All rights reserved.
+  Teacher-made website for classroom learning. All rights reserved. · v4
 </footer>
 
 <script>
@@ -145,7 +145,7 @@
    Paste your Apps Script Web app link between the quotes (it ends with /exec).
    With the link: live race, shared road map, teacher dashboard and noise penalties.
    Left empty: the page works as single-player practice only.                     */
-var API_URL = "https://script.google.com/macros/s/AKfycbywXMvtFFHmCGUOXtA2tJTQa-CUtn3nFqlc3licQhEwcPmK_Q63XRzgR2PBszHihHT8IA/exec";
+var API_URL = "https://script.google.com/macros/s/AKfycbyFBMlEI3KI-H42V73ax4uiPezj4MxDDyGCOb0pgDeMoznlzGKzs_a2qLhdWFwvJtjv1g/exec";
 
 /* ===== Mini Python engine: print( ), + - * /, brackets and stored variables ===== */
 function pyEval(src,env){
@@ -248,11 +248,22 @@ function gen(){
 }
 
 /* ===== Protected state (kept inside this closure) ===== */
-var S=null, KEY="pgp_run3", SALT="sis-juwaiza-gp", board=[], online=true, timer=null, busy=false, again=false, resets=0, note="";
+var S=null, KEY="pgp_run4", SALT="sis-juwaiza-gp", VERSION=4, board=[], online=true, oldScript=false, timer=null, busy=false, again=false, resets=0, note="";
+/* The race is remembered by the browser itself (not by one tab), so opening the link in another tab,
+   switching tabs or refreshing carries on with the same driver. It is cleared by Sign out or a new race. */
+var store=(function(){try{localStorage.setItem("pgp_t","1");localStorage.removeItem("pgp_t");return localStorage;}catch(e){try{return sessionStorage;}catch(e2){return null;}}})();
+function devId(){
+  try{var d=store.getItem("pgp_dev");if(!d){d="";for(var k=0;k<16;k++)d+="abcdefghijklmnopqrstuvwxyz0123456789"[Math.floor(Math.random()*36)];store.setItem("pgp_dev",d);}return d;}catch(e){return "";}
+}
 function h(str){var x=5381;for(var i=0;i<str.length;i++)x=((x<<5)+x+str.charCodeAt(i))|0;return Math.abs(x);}
-function save(){try{var j=JSON.stringify(S);sessionStorage.setItem(KEY,j+"|"+h(j+SALT));}catch(e){}}
-function load(){try{var raw=sessionStorage.getItem(KEY);if(!raw)return;var i=raw.lastIndexOf("|"),j=raw.slice(0,i);
-  if(String(h(j+SALT))===raw.slice(i+1))S=JSON.parse(j);else sessionStorage.removeItem(KEY);}catch(e){}}
+function save(){try{var j=JSON.stringify(S);store.setItem(KEY,j+"|"+h(j+SALT));}catch(e){}}
+function load(){
+  try{
+    var raw=store.getItem(KEY);if(!raw){S=null;return;}
+    var i=raw.lastIndexOf("|"),j=raw.slice(0,i),o=String(h(j+SALT))===raw.slice(i+1)?JSON.parse(j):null;
+    if(o&&Date.now()-o.t0<4*3600*1000)S=o;else{S=null;store.removeItem(KEY);}   // older than 4 hours: a previous class
+  }catch(e){}
+}
 function netPts(){return Math.max(0,S.pts-5*S.pen);}
 function addPts(n){S.pts+=n;save();paint();sync();}
 
@@ -268,7 +279,7 @@ function paint(){
   $("main").className=on&&API_URL?"":"solo";
   $("net").hidden=!on;
   if(!on)return;
-  $("net").textContent=!API_URL?"Practice mode":online?"● Live":"Reconnecting…";
+  $("net").textContent=!API_URL?"Practice mode":oldScript?"⚠ Teacher: update Apps Script":online?"● Live":"Reconnecting…";
   $("who").textContent=S.name+" · "+S.cls+" "+S.div;
   $("pts").textContent=netPts();
   $("car").textContent=CARS[S.car]||CARS[0];
@@ -283,6 +294,7 @@ function api(params){
   return fetch(API_URL+"?"+qs,{redirect:"follow"}).then(function(r){return r.json();});
 }
 function applyJoin(r){
+  oldScript=r.v!==VERSION;
   S.id=r.id||S.id;S.rid=r.rid;if(r.name)S.name=r.name;
   if(typeof r.pen==="number")S.pen=r.pen;
   if(typeof r.ls==="number"&&r.ls>S.ln)S.ln=r.ls;
@@ -306,9 +318,10 @@ function sync(){
     if(r.reset){if(++resets>=2){signOut("Your teacher started a new race. Please sign in again.");}return;}
     resets=0;
     if(r.rejoin){                                  // the sheet lost this driver: put them back with their progress
-      return api({action:"join",restore:1,id:S.id,name:S.name,cls:S.cls,div:S.div,car:S.car,step:S.done,pts:S.pts}).then(function(j){if(S&&j.ok)applyJoin(j);});
+      return api({action:"join",restore:1,dev:devId(),id:S.id,name:S.name,cls:S.cls,div:S.div,car:S.car,step:S.done,pts:S.pts}).then(function(j){if(S&&j.ok)applyJoin(j);});
     }
     if(!r.ok)return;
+    oldScript=r.v!==VERSION;
     if(r.board)board=r.board;
     if(typeof r.ack==="number"){S.q=S.q.filter(function(x){return x.n>r.ack;});if(S.q.length)again=true;save();}
     if(typeof r.pen==="number"&&r.pen!==S.pen){S.pen=r.pen;save();}
@@ -355,14 +368,14 @@ function login(){
       tries:0,streak:0,x2:false,chest:false,task:null,cn:0,q:[],ln:0,t0:Date.now(),t1:0};
     if(!API_URL){S=base;save();route();return;}
     $("go").disabled=true;$("lm").textContent="Connecting…";
-    api({action:"join",id:id,name:n,cls:base.cls,div:base.div,car:car}).then(function(r){
+    api({action:"join",dev:devId(),id:id,name:n,cls:base.cls,div:base.div,car:car}).then(function(r){
       if(!r.ok)throw 0;
       S=base;applyJoin(r);
       route();sync();
     }).catch(function(){$("go").disabled=false;$("lm").textContent="Could not connect. Check the internet and try again.";});
   };
 }
-function signOut(msg){clearTimeout(timer);try{sessionStorage.removeItem(KEY);}catch(e){}S=null;board=[];resets=0;note=msg||"";paint();login();}
+function signOut(msg){clearTimeout(timer);try{store.removeItem(KEY);}catch(e){}S=null;board=[];resets=0;note=msg||"";paint();login();}
 function route(){
   paint();
   if(!S)return login();
@@ -571,6 +584,11 @@ function confetti(){
 }
 
 $("outBtn").onclick=function(){signOut("");};
+/* keep every tab of this browser on the same driver and the same progress */
+function refresh(){var was=S?JSON.stringify(S):"";load();if((S?JSON.stringify(S):"")!==was){if(!S){clearTimeout(timer);board=[];}route();}if(S)sync();}
+window.addEventListener("storage",function(e){if(e.key===KEY)refresh();});
+document.addEventListener("visibilitychange",function(){if(!document.hidden)refresh();});
+window.addEventListener("focus",refresh);
 load();route();sync();
 })();
 </script>
